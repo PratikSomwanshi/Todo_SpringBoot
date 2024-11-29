@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo App</title>
+</head>
+<body>
+    <h1>Tasks</h1>
+
+    <form action="todo" method="post">
+        <div>
+            <label for="task">Task</label>
+            <input type="text" id="task" name="title" />
+        </div>
+        <div>
+            <button type="submit">submit</button>
+        </div>
+    </form>
+
+<th:block th:each="task : ${tasks}">
+    <div>
+        <span th:text="${task.title}"></span>
+        <span th:text="${task.completed}"></span>
+    </div>
+</th:block>
+</body>
+</html>
