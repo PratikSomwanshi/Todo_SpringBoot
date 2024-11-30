@@ -14,7 +14,7 @@ public class SuccessResponse<T> {
     private Boolean success;
     private String message;
     private Explanation explanation;
-    private List<T> data= new ArrayList<>();
+    private List<T> data = new ArrayList<>();
 
     public SuccessResponse(Boolean success, String message, T data) {
         this.success = success;
