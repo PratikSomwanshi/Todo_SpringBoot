@@ -2,6 +2,7 @@ package com.wanda.controller;
 
 import com.wanda.entity.Users;
 import com.wanda.service.UserService;
+import com.wanda.utils.exceptions.response.LoginResponse;
 import com.wanda.utils.exceptions.response.SuccessResponse;
 import com.wanda.utils.exceptions.response.TokenResponse;
 import org.springframework.http.ResponseEntity;
@@ -33,15 +34,13 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<SuccessResponse<TokenResponse>> login(@RequestBody Users user){
-        String token = this.userService.verify(user);
+    public ResponseEntity<SuccessResponse<LoginResponse>> login(@RequestBody Users user){
+        LoginResponse loginResponse = this.userService.verify(user);
 
-        TokenResponse tokenResponse = new TokenResponse(token);
-
-        SuccessResponse<TokenResponse> success = new SuccessResponse<>(
+        SuccessResponse<LoginResponse> success = new SuccessResponse<>(
                 true,
                 "Successfully generated the token",
-                tokenResponse
+                loginResponse
         );
 
         return ResponseEntity.ok(success);

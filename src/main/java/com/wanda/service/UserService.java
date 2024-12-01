@@ -1,8 +1,11 @@
 package com.wanda.service;
 
+import com.wanda.dto.CustomUserDetails;
 import com.wanda.entity.Users;
 import com.wanda.repository.UsersRepository;
 import com.wanda.utils.exceptions.CustomException;
+import com.wanda.utils.exceptions.response.LoginResponse;
+import com.wanda.utils.exceptions.response.TokenResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -62,14 +65,19 @@ public class UserService {
         return this.usersRepository.save(newUser);
     }
 
-    public String verify(Users user) {
+    public LoginResponse verify(Users user) {
         try {
             Authentication authenticate = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
             );
 
             if (authenticate.isAuthenticated()) {
-                return jwtService.generate(user.getEmail()); // Generate JWT token
+                CustomUserDetails fetchedUser = (CustomUserDetails) authenticate.getPrincipal();
+
+                String token = jwtService.generate(user.getEmail());
+
+                return new LoginResponse(fetchedUser.getUsername(),fetchedUser.getEmailUsername(), token);
+
             }
 
             throw new CustomException("Authentication failed"); // Should not reach here
