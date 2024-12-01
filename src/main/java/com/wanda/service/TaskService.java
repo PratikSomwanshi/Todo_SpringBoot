@@ -22,7 +22,7 @@ public class TaskService {
 
     public Task createTask(String title) {
 
-        if(title.isEmpty()) throw new CustomException("title is empty", HttpStatus.BAD_REQUEST);
+        if(title.isEmpty()) throw new CustomException("title is empty", HttpStatus.BAD_REQUEST, "TODO_CREATED");
 
         Task task = new Task();
         task.setTitle(title);
@@ -46,13 +46,13 @@ public class TaskService {
 
         if(task.isPresent()) return task.get();
 
-        throw new CustomException("Task not found", HttpStatus.NOT_FOUND);
+        throw new CustomException("Task not found", HttpStatus.NOT_FOUND, "TASK_NOT_FOUND");
     }
 
     public Task updateTask(String id, String title, Boolean completed) {
         var task = this.taskRepository.findById(id);
 
-        if(task.isEmpty()) throw new CustomException("Task not found", HttpStatus.NOT_FOUND);
+        if(task.isEmpty()) throw new CustomException("Task not found", HttpStatus.NOT_FOUND, "TASK_NOT_FOUND");
 
         if(title != null) task.get().setTitle(title);
 

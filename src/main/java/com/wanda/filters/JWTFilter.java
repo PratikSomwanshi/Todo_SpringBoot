@@ -3,6 +3,7 @@ package com.wanda.filters;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wanda.service.CustomUserDetailsService;
 import com.wanda.service.JWTService;
+import com.wanda.utils.exceptions.CustomException;
 import com.wanda.utils.exceptions.response.ErrorResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -71,9 +72,10 @@ public class JWTFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
 
-        } catch (Exception e) {
+        } catch (CustomException e) {
             // Handle token errors
-            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            logger.info("exception code " + e.getCode());
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage(), e.getCode());
             return;
         }
 
@@ -84,14 +86,17 @@ public class JWTFilter extends OncePerRequestFilter {
     /**
      * Helper method to send an error response in the `ErrorResponse` format.
      */
-    private void sendErrorResponse(HttpServletResponse response, int status, String explanation) throws IOException {
+    private void sendErrorResponse(HttpServletResponse response, int status, String explanation, String code) throws IOException {
         response.setStatus(status);
         response.setContentType("application/json");
+
+        logger.debug("code " + code);
 
         ErrorResponse errorResponse = new ErrorResponse(
                 false,
                 "Authentication failed",
-                explanation
+                explanation,
+                code
         );
 
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));

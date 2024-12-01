@@ -1,6 +1,5 @@
 package com.wanda.utils.exceptions;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
@@ -10,11 +9,13 @@ import org.springframework.http.HttpStatus;
 public class CustomException extends  RuntimeException{
 
     private HttpStatus statusCode;
+    private String code;
 
 
-    public CustomException(String msg, HttpStatus statusCode) {
+    public CustomException(String msg, HttpStatus statusCode, String code) {
         super(msg);
         this.statusCode = statusCode;
+        this.code = code;
     }
 
     public CustomException(String msg){

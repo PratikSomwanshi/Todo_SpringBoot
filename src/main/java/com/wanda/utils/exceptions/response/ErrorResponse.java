@@ -15,10 +15,10 @@ public class ErrorResponse {
     private Explanation error;
     private List<?> data= new ArrayList<>();
 
-    public ErrorResponse(Boolean success, String message, String explanation) {
+    public ErrorResponse(Boolean success, String message, String explanation, String code) {
         this.success = success;
         this.message = message;
-        this.error = new Explanation(explanation);
+        this.error = new Explanation(explanation, code);
     }
 }
 
@@ -27,10 +27,12 @@ public class ErrorResponse {
 @Setter
 class Explanation{
     private String explanation;
+    private String code;
 
     public Explanation() {}
 
-    public Explanation(String explanation){
+    public Explanation(String explanation, String code) {
         this.explanation = explanation;
+        this.code = code;
     }
 }

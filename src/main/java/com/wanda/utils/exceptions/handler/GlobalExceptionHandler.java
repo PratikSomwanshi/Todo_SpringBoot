@@ -2,9 +2,6 @@ package com.wanda.utils.exceptions.handler;
 
 import com.wanda.utils.exceptions.CustomException;
 import com.wanda.utils.exceptions.response.ErrorResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,7 +14,8 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 false,
                 "Something Went Wrong",
-                e.getMessage()
+                e.getMessage(),
+                e.getCode()
         );
 
         return new ResponseEntity<>(error, e.getStatusCode());
@@ -31,7 +29,8 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 false,
                 "Something Went Wrong",
-                (e.getMessage() != null) ? e.getMessage() : "Internal Server Error"
+                (e.getMessage() != null) ? e.getMessage() : "Internal Server Error",
+                (e.getCode().isEmpty()) ? "ERROR" : e.getCode()
         );
 
         return new ResponseEntity<>(error, e.getStatusCode());

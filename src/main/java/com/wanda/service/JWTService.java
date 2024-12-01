@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.KeyGenerator;
@@ -51,7 +52,7 @@ public class JWTService {
                 .claims(claims)
                 .subject(username)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 10))
+                .expiration(new Date(System.currentTimeMillis() + 30 * 60 * 1000))
                 .signWith( getKey(), Jwts.SIG.HS256 )
                 .compact();
 
@@ -64,12 +65,12 @@ public class JWTService {
     public String extractEmail(String bearer) {
 
         if(bearer.isEmpty()) {
-            throw new CustomException("Tocken Not Found");
+            throw new CustomException("Tocken Not Found", HttpStatus.UNAUTHORIZED, "TOKEN_NOT_FOUND");
         }
 
         if(!bearer.startsWith("Bearer")) {
             System.out.println(bearer);
-            throw new CustomException("Invalid Tocken");
+            throw new CustomException("Invalid Tocken", HttpStatus.UNAUTHORIZED, "TOKEN_INVALID");
         }
 
         String tocken = bearer.substring(7);
@@ -97,9 +98,9 @@ public class JWTService {
                     .parseSignedClaims(tocken)
                     .getPayload();
         }catch (ExpiredJwtException ex){
-            throw new CustomException("Tocken Expired");
+            throw new CustomException("Tocken Expired", HttpStatus.UNAUTHORIZED, "TOKEN_EXPIRED");
         }catch(JwtException ex){
-            throw new CustomException("JWT malformed / invalid token");
+            throw new CustomException("JWT malformed / invalid token", HttpStatus.UNAUTHORIZED, "TOKEN_INVALID");
         }catch(Exception ex){
             throw new CustomException(ex.getMessage());
         }
