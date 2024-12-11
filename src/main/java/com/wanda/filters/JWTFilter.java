@@ -42,7 +42,8 @@ public class JWTFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         // Skip filtering for login and register endpoints
-        if (path.equals("/login") || path.equals("/register")) {
+        System.out.println(path);
+        if (path.equals("/login") || path.equals("/register") || path.equals("/user") || path.equals("/google/login")) {
             filterChain.doFilter(request, response);
             return;
         }

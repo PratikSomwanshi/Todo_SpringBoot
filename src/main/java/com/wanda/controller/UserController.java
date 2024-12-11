@@ -1,10 +1,13 @@
 package com.wanda.controller;
 
+import com.wanda.dto.AccessToken;
 import com.wanda.entity.Users;
+import com.wanda.service.GoogleOAuthService;
 import com.wanda.service.UserService;
+import com.wanda.utils.exceptions.CustomException;
 import com.wanda.utils.exceptions.response.LoginResponse;
 import com.wanda.utils.exceptions.response.SuccessResponse;
-import com.wanda.utils.exceptions.response.TokenResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,9 +17,32 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private UserService userService;
+    private GoogleOAuthService googleOAuthService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, GoogleOAuthService googleOAuthService) {
         this.userService = userService;
+        this.googleOAuthService = googleOAuthService;
+    }
+
+
+    @PostMapping("/user")
+    public ResponseEntity<?> getUser(@RequestBody Users user) {
+
+        try {
+            var existingUser = userService.getUserByEmail(user.getEmail());
+
+
+
+            var success = new SuccessResponse<>(
+                    true,
+                    "Successfully saved the user",
+                    existingUser
+            );
+
+            return ResponseEntity.ok(success);
+        }catch(Exception e) {
+            throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND, "EMAIL_NOT_EXIST");
+        }
     }
 
 
@@ -41,6 +67,22 @@ public class UserController {
                 true,
                 "Successfully generated the token",
                 loginResponse
+        );
+
+        return ResponseEntity.ok(success);
+    }
+
+
+    @PostMapping("/google/login")
+    public ResponseEntity<SuccessResponse<?>> googleLogin(@RequestBody AccessToken accessToken){
+
+        var b = this.googleOAuthService.validateGoogleOAuthToken(accessToken.getAccessToken());
+
+
+        SuccessResponse<?> success = new SuccessResponse<>(
+                true,
+                "Successfully generated the token",
+                b
         );
 
         return ResponseEntity.ok(success);

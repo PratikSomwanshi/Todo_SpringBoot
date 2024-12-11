@@ -30,6 +30,7 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
+//
     public Users getUserByEmail(String email){
 
         var user = this.usersRepository.findByEmail(email);

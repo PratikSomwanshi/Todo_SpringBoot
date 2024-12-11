@@ -46,7 +46,7 @@ public class SpringSecurityConfig {
                         req ->
 
                             req
-                                    .requestMatchers("/login", "/register").permitAll()
+                                    .requestMatchers("/login", "/register", "/user", "/google/login").permitAll()
                                     .anyRequest().authenticated()
 
                 );
