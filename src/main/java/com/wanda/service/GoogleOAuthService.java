@@ -10,10 +10,12 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.wanda.entity.Users;
 import com.wanda.utils.exceptions.CustomException;
 import com.wanda.utils.exceptions.response.LoginResponse;
-import com.wanda.utils.exceptions.response.TokenResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Collections;
 
 @Service
@@ -53,18 +55,49 @@ public class GoogleOAuthService {
                 throw new CustomException("Invalid Google OAuth token", HttpStatus.NOT_FOUND, "INVALID_GOOGLE_OAUTH_TOKEN");
             }
 
-            GoogleIdToken.Payload payload = idToken.getPayload();
+            GoogleIdToken.Payload payload =  idToken.getPayload();
 
             var email = payload.getEmail();
 
-            var existingUser = this.userService.getUserByEmail(email);
-
-            String token = this.jwtService.generate(existingUser.getEmail());
 
 
+            try {
 
-            return new LoginResponse(existingUser.getEmail(), existingUser.getUsername(), token);
+                var existingUser = this.userService.getUserByEmail(email);
 
+
+                String token = this.jwtService.generate(existingUser.getEmail());
+
+
+                return new LoginResponse(existingUser.getEmail(), existingUser.getUsername(), token);
+
+            }catch(UsernameNotFoundException e){
+
+
+                System.out.println("username  " + payload.get("name"));
+                Users user = new Users();
+                user.setEmail(email);
+                user.setUsername((String) payload.get("name"));
+
+                int bytes = 1024; // 1024 bytes = 8192 bits
+                SecureRandom secureRandom = new SecureRandom();
+                byte[] randomBytes = new byte[bytes];
+
+                secureRandom.nextBytes(randomBytes);
+
+                String passwordBase64 = Base64.getEncoder().encodeToString(randomBytes);
+
+                user.setPassword(passwordBase64);
+//
+                var registerUser = this.userService.saveUser(user);
+
+
+                String token = this.jwtService.generate(registerUser.getEmail());
+
+                return new LoginResponse(registerUser.getEmail(), registerUser.getUsername(), token);
+
+
+            }
         } catch (CustomException e) {
             e.printStackTrace();
             throw new CustomException(e.getMessage(), e.getStatusCode(), e.getCode());
